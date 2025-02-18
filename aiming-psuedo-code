@@ -1,0 +1,61 @@
+Initialize:
+    - Load our model 
+    - Set PID constants (Kp, Ki, Kd) for horizontal and vertical control
+    - Initialize motor interface (for worm and wheel system - AI generated that I dont know how gears work)
+
+Function PID_Controller(error, previous_error, integral, Kp, Ki, Kd, dt):
+    proportional = Kp * error
+    integral += error * dt
+    derivative = (error - previous_error) / dt
+    output = proportional + (Ki * integral) + (Kd * derivative)
+    return output, integral
+
+Function Aim_System():
+    Capture video frame from camera
+
+    While True:
+        Run model inference on frame
+        If target detected:
+            Extract bounding box (x1, y1, x2, y2)
+            Calculate target_center = (x_center, y_center) from bounding box
+            Calculate frame_center = (frame_width / 2, frame_height / 2)
+
+            # Calculate error (difference between crosshair and target)
+            error_x = frame_center.x - target_center.x  # Horizontal error
+            error_y = frame_center.y - target_center.y  # Vertical error
+
+            # PID calculations for both axes
+            motor_x_output, integral_x = PID_Controller(error_x, prev_error_x, integral_x, Kp_x, Ki_x, Kd_x, dt)
+            motor_y_output, integral_y = PID_Controller(error_y, prev_error_y, integral_y, Kp_y, Ki_y, Kd_y, dt)
+
+            # Update previous errors
+            prev_error_x = error_x
+            prev_error_y = error_y
+
+            # Control worm and wheel motors
+            if abs(error_x) > tolerance_x:
+                Move_Motor_X(motor_x_output)  # Left/Right motion
+
+            if abs(error_y) > tolerance_y:
+                Move_Motor_Y(motor_y_output)  # Up/Down motion
+
+        Display frame with crosshair and bounding box
+
+        If 'q' key is pressed:
+            Break loop
+
+    Release camera and close window
+
+Function Move_Motor_X(output):
+    If output > 0:
+        Rotate motor clockwise (move right)
+    Else if output < 0:
+        Rotate motor counterclockwise (move left)
+    Set motor speed proportional to output (limit to max_speed)
+
+Function Move_Motor_Y(output):
+    If output > 0:
+        Rotate motor upwards
+    Else if output < 0:
+        Rotate motor downwards
+    Set motor speed proportional to output (limit to max_speed)
