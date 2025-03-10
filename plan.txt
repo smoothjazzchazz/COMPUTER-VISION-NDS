@@ -1,0 +1,6 @@
+Train YOLOv8 and export it to ONNX.
+Convert ONNX to TensorFlow SavedModel.
+Convert TensorFlow model to TFLite (with optimizations).
+Run TFLite inference on an edge device.
+Integrate DeepSORT or ByteTrack for multi-object tracking.
+Deploy on Jetson Nano, Raspberry Pi, or Coral TPU
